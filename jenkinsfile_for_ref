@@ -1,0 +1,58 @@
+pipeline{
+    agent any
+    stages {
+        stage('Stage I - Clone from github'){
+            steps {
+                git 'https://github.com/lalithkota/CalcAssign_SPE.git'
+            }
+        }
+        stage('Stage II - Build'){
+            steps{
+                sh 'mvn clean package'
+            }
+            post{
+                success{
+                    echo 'Built Successful'
+                }
+            }
+        }
+        
+        stage('Stage III - Test') {
+            steps {
+                sh 'mvn test'
+            }
+            
+            post {
+                success {
+                    echo 'Testing Successful'
+                }
+            }
+        }
+        stage('Stage IV - Make Docker Image & Push') {
+            steps{
+                script {
+                    registry="lalithkota/calc_assign_server"
+                    registryCrendential='151ba0f4-4d9d-47b0-936e-c4f943d04901'
+                    dockerImage=docker.build() registry + ":latest"
+                    docker.withRegistry( '', registryCredential ) {
+                        dockerImage.push()
+                    }
+                }
+            }
+        }
+        stage('Stage V - Trigger Rundeck'){
+            steps{
+                script {
+                    step([  $class: "RundeckNotifier",
+                            includeRundeckLogs: true,
+                            jobId: "deb9a3fa-f87a-4028-af5c-c48cd729a129",
+                            rundeckInstance: "Rundeck",
+                            shouldFailTheBuild: true,
+                            shouldWaitForRundeckJob: true,
+                            tailLog: true])
+                }
+            }
+        }
+    }
+    
+}
