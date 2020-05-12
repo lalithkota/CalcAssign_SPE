@@ -3,6 +3,7 @@ pipeline{
     stages {
         stage('Stage I - Clone from github'){
             steps {
+                echo 'Git Cloning Success'
                 git 'https://github.com/lalithkota/CalcAssign_SPE.git'
             }
         }
@@ -30,11 +31,10 @@ pipeline{
         }
         stage('Stage IV - Make Docker Image & Push') {
             steps{
-                script {
-                    registry="lalithkota/calc_assign_server"
-                    registryCrendential='151ba0f4-4d9d-47b0-936e-c4f943d04901'
-                    dockerImage=docker.build() registry + ":latest"
-                    docker.withRegistry( '', registryCredential ) {
+                sh 'cp target/*SNAPSHOT.jar myJar.jar'
+                script{
+                    def dockerImage=docker.build("lalithkota/calc_assign_server")
+                    docker.withRegistry( '', 'docker-hub-creds') {
                         dockerImage.push()
                     }
                 }
@@ -46,9 +46,9 @@ pipeline{
                     step([  $class: "RundeckNotifier",
                             includeRundeckLogs: true,
                             jobId: "deb9a3fa-f87a-4028-af5c-c48cd729a129",
-                            rundeckInstance: "Rundeck",
+                            rundeckInstance: "Rundeck_inst_1",
                             shouldFailTheBuild: true,
-                            shouldWaitForRundeckJob: true,
+                            shouldWaitForRundeckJob: false,
                             tailLog: true])
                 }
             }
