@@ -7,6 +7,7 @@ package com.mycalc.app;
 public class Main{
     public static void main( String[] args )
     {
-        ServerSocket server_socket = new ServerSocket();
+        System.out.println( "Hello World!" );
+        //ServerSocket server_socket = new ServerSocket();
     }
 }
