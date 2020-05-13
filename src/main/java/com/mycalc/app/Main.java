@@ -42,12 +42,15 @@ class AdvThread extends Thread{
             
             try{
                 sended_value = null;
-                if((str = read_one_msg()).equals("exit")) break;
+                str = read_one_msg();
+                if(str.equals("exit")) break;
+                if(str.equals("admin:exit")) {Main.received_close_server();break;}
                 System.out.println("" + str);
-                sended_value = String.valueOf(parse_and_compute(str));
+                sended_value = parse_and_compute(str);
             }
             catch(IOException ioe){
                 System.out.println("err1");
+                break;
             }
             catch(ScriptException se){
                 System.out.println("err2");
@@ -70,8 +73,8 @@ class AdvThread extends Thread{
         
     }
     
-    double parse_and_compute(String input_str) throws ScriptException {
-        return Double.parseDouble(js_engine.eval(input_str).toString());
+    String parse_and_compute(String input_str) throws ScriptException {
+        return js_engine.eval(input_str).toString();
     }
     
     String read_one_msg() throws IOException{
@@ -91,17 +94,20 @@ public class Main{
     static ArrayList<Socket> clients;
     
     static void received_close_server() throws IOException{
+        System.out.println("Received server quit");
         for(Socket s: clients){
             s.close();
         }
         ss.close();
+        System.exit(0);
     }
     
     public static void main( String[] args ){
         
         try{
-            System.out.println("Server IP: " + args[0]+ " Server Port: " + args[1]);
-            ss = new ServerSocket(Integer.valueOf(args[1]),100,InetAddress.getByName(args[0]));
+            //System.out.println("Server IP: " + args[0]+ " Server Port: " + args[1]);
+            ss = new ServerSocket(Integer.valueOf(args[0]),1000);
+            System.out.println("Server is at: " + ss.toString());
         }
         catch(Exception e){System.out.println(e);return;}
         
