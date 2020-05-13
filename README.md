@@ -1,5 +1,5 @@
 # CalcAssign_server
-This repo is part of the Assigment od Software Production Engineering Course. (To understand DevOps toolchain.)
+This repo is part of the Assigment of Software Production Engineering Course. (To understand DevOps toolchain.)
 It is a calculator app. It basically hosts a server, where clients can connect and ask it results for math expression.
 It uses simple java sockets and threads.
 (It uses JS Nashorn Engine to eval exprs, so it should be able to run any such exprs.)
