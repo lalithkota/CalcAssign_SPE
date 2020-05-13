@@ -11,7 +11,6 @@ class AdvThread extends Thread{
     Socket this_client;
     DataInputStream this_client_dis;
     DataOutputStream this_client_dos;
-    ScriptEngine js_engine;
     
     AdvThread(Socket s){
         this_client = s;
@@ -26,13 +25,6 @@ class AdvThread extends Thread{
         }
         catch(IOException e){
             //do something
-            return;
-        }
-        
-        try{
-            js_engine = (new ScriptEngineManager()).getEngineByName("JavaScript");
-        }
-        catch(NullPointerException e){
             return;
         }
         
@@ -74,7 +66,7 @@ class AdvThread extends Thread{
     }
     
     String parse_and_compute(String input_str) throws ScriptException {
-        return js_engine.eval(input_str).toString();
+        return Main.js_engine.eval(input_str).toString();
     }
     
     String read_one_msg() throws IOException{
@@ -92,6 +84,7 @@ class AdvThread extends Thread{
 public class Main{
     static ServerSocket ss;
     static ArrayList<Socket> clients;
+    static ScriptEngine js_engine;
     
     static void received_close_server() throws IOException{
         System.out.println("Received server quit");
@@ -112,6 +105,14 @@ public class Main{
         catch(Exception e){System.out.println(e);return;}
         
         clients = new ArrayList<Socket>();
+        
+        try{
+            js_engine = (new ScriptEngineManager()).getEngineByName("JavaScript");
+        }
+        catch(NullPointerException e){
+            return;
+        }
+        
         while(true){
             try{
                 new AdvThread(ss.accept()).start();
